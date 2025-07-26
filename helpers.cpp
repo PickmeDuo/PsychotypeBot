@@ -85,4 +85,8 @@ namespace Psycho {
         return result;
     } 
 
+    //std::string PsychologicalAnalyzerBot::analyzeGroup(const std::string& name) {
+
+    //}
+
 }
