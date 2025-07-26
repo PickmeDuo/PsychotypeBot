@@ -11,15 +11,15 @@ namespace Psycho {
         std::string clear;
         clear.reserve(text.size());
 
-        //проходим по символам, пробел или буква -> 
+        //проходим по символам, буква -> 
         // -> приводим к нижнему и кладём в clear
 
         for (char c : text) {
-            if (std::isalpha(static_cast<unsigned char>(c)) || 
-            std::isspace(static_cast<unsigned char>(c))) {
+            if (std::isalpha(static_cast<unsigned char>(c))) {
                 clear += std::tolower(static_cast<unsigned char>(c));
+            } else {
+                clear += ' ';
             }
-        }
 
         std::vector<std::string> words;
         std::istringstream iss(clear); //разбиваем по пробелам
