@@ -2,6 +2,7 @@
 #define PSYCHO_HPP
 
 #include <tgbot/tgbot.h>
+#include <nlohmann/json.hpp>
 
 #include <string>
 #include <vector>
