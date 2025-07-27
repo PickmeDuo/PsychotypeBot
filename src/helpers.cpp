@@ -20,6 +20,7 @@ namespace Psycho {
             } else {
                 clear += ' ';
             }
+        }
 
         std::vector<std::string> words;
         std::istringstream iss(clear); //разбиваем по пробелам
