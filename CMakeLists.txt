@@ -10,11 +10,6 @@ set(TGBOT_INCLUDE_DIR "C:/Code/tgbot-cpp/include")
 set(TGBOT_LIBRARY "C:/Code/tgbot-cpp/build/libtgbot.a")
 set(BOOST_ROOT "C:/Code/boost/")
 
-# Подключаем заголовки
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
 # Подключаем зависимости
 find_package(Boost REQUIRED COMPONENTS)
 
@@ -29,9 +24,14 @@ add_executable(${PROJECT_NAME}
     src/helpers.cpp
 )
 
+# Подключаем заголовки
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
 target_link_libraries(PsychotypeBot
     ${TGBOT_LIBRARY}
     ${Boost_LIBRARIES}
     ssl crypto ws2_32 crypt32
 )
-endif()
+# endif()

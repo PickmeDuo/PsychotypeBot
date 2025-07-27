@@ -5,7 +5,7 @@
 #include <map>
 
 namespace Psycho {
-    std::map<std::string, std::map<std::string, int>> psychotypeKeywords = {
+    inline std::map<std::string, std::map<std::string, int>> psychotypeKeywords = {
     {"Пикми", {
         {"мяу", 10}, {"мява", 10}, {"мявке", 10}, {"мявка", 9}, {"мур", 10}, {"мурр", 10}, {"муррр", 10}, {"муром", 9}, 
         {"ня", 10}, {"дискордик", 10}, {"ножки", 10}, {"милафка", 9}, {"пикми", 9}, {"пикме", 9}, {"пикмуха", 8}, {"пикмей", 8}, 

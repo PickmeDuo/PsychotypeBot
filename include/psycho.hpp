@@ -20,7 +20,7 @@ namespace Psycho {
         PsychologicalAnalyzerBot(const PsychologicalAnalyzerBot&) = delete;
         PsychologicalAnalyzerBot& operator=(const PsychologicalAnalyzerBot&) = delete;
 
-        ~PsychologicalAnalyzerBot();
+        ~PsychologicalAnalyzerBot() = default;
 
         // Запуск бота и всех обработчиков
         void start();
@@ -34,7 +34,7 @@ namespace Psycho {
 
         // Главный словарь: ключ — название психотипа, 
         // значение — map<ключевое слово, "вес" (важность или частота)>.
-        std::map<std::string, std::map<std::string, int>> psychotypeKeywords;
+        static std::map<std::string, std::map<std::string, int>> psychotypeKeywords;
 
         // Парсит строку сообщения на отдельные слова.
         // убирает знаки препинания, приводит к нижнему регистру и т.п.

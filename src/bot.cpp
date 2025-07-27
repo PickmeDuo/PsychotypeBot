@@ -139,7 +139,7 @@ void Psycho::PsychologicalAnalyzerBot::start() {
 
 int main() {
 
-    Psycho::PsychologicalAnalyzerBot psycho_bot("TOKEN"); // ВСТАВИТЬ ПИКМИ ТОКЕН
+    Psycho::PsychologicalAnalyzerBot psycho_bot("8135955950:AAG4tPbLm3aWbdwL90alYbrQGBzBG9Y0HhM"); // ВСТАВИТЬ ПИКМИ ТОКЕН
 
     psycho_bot.start();
     
