@@ -85,8 +85,19 @@ namespace Psycho {
         return result;
     } 
 
-    //std::string PsychologicalAnalyzerBot::analyzeGroup(const std::string& name) {
+    std::string PsychologicalAnalyzerBot::analyzeGroup(std::map<std::string, std::map<std::string, int>>& tendency) {
+        if (tendency.empty()) {
+            return "Нет данных для анализа"
+        }
 
-    //}
+        std::string result;
+
+        for (const auto& [name, score] : tendency) {
+            std::string psycho == analyzePerson(name);
+            result += name + ": " + psycho + "\n";
+        }
+
+        return result;
+    }
 
 }
