@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 
 namespace Psycho {
     class PsychologicalAnalyzerBot {
@@ -22,11 +23,10 @@ namespace Psycho {
         ~PsychologicalAnalyzerBot();
 
         // Запуск бота и всех обработчиков
-        void run();
+        void start();
 
     private:
-        // Основной объект бота от TgBot
-        TgBot::Bot bot;
+        std::unique_ptr<TgBot::Bot> bot;
 
         // Склонность каждого пользователя к различным психотипам.
         // Ключ — username, значение — map<психотип, количество слов склоняющих к психотипу>.
@@ -50,13 +50,9 @@ namespace Psycho {
         // ????
         std::string analyzeGroup(const std::map<std::string, std::map<std::string, int>>& tendency);
 
-        // Обработчик сообщений в группе.
-        // Вызывается при каждом новом сообщении.
-        void onGroupMessage(TgBot::Message::Ptr message);
-
-        // Обработчик сообщений в личку боту.
-        // Например: запрос результатов анализа.
-        void onPrivateMessage(TgBot::Message::Ptr message);
+        // Обработчик сообщений в группе.Вызывается при каждом новом сообщении.
+        // Парсит сообщение message, анализирует и добавляет данные в tendency человеку с ником username.
+        void onGroupMessage(const std::string& message, const std::string& username);
     };
 
 } 
