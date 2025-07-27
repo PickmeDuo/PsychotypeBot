@@ -1,6 +1,8 @@
 #ifndef PSYCHO_HPP
 #define PSYCHO_HPP
 
+#include "dictionary.hpp"
+
 #include <tgbot/tgbot.h>
 #include <nlohmann/json.hpp>
 
