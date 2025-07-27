@@ -74,6 +74,27 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
         );
     });
 
+    // Команда /person [username]
+    bot->getEvents().onCommand("person", [this](TgBot::Message::Ptr message) {
+        // Проверяем, что команда имеет аргумент
+        if (message->text.empty() || message->text.find(' ') == std::string::npos) {
+            bot->getApi().sendMessage(message->chat->id, "Использование: /person [username]");
+            return;
+        }
+
+        // Извлекаем username из команды
+        std::string username = message->text.substr(message->text.find(' ') + 1);
+        
+        // Удаляем возможные @ в начале
+        if (!username.empty() && username[0] == '@') {
+            username = username.substr(1);
+        }
+
+        // Вызываем анализ пользователя
+        std::string analysisResult = analyzePerson(username);
+        bot->getApi().sendMessage(message->chat->id, "@" + username + " " + analysisResult);
+    });
+
 
     // Обработчик нажатий кнопок
     bot->getEvents().onCallbackQuery([this](TgBot::CallbackQuery::Ptr query) {

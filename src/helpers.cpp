@@ -123,7 +123,7 @@ namespace Psycho {
         }
     }
     void PsychologicalAnalyzerBot::onGroupMessage(const std::string& message, const std::string& username) {
-        std::vectot<std::string> words = parseMessage(message);
+        std::vector<std::string> words = parseMessage(message);
 
         for (const auto& word : words) {
             for (const auto& [psychotype, key] : psychotypeKeywords) {
