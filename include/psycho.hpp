@@ -47,7 +47,7 @@ namespace Psycho {
         // Возвращает название наиболее вероятного психотипа.
         std::string analyzePerson(const std::string& name);
 
-        // ????
+        // Анализ собранных данных по группе
         std::string analyzeGroup(const std::map<std::string, std::map<std::string, int>>& tendency);
 
         // Обработчик сообщений в группе.Вызывается при каждом новом сообщении.
