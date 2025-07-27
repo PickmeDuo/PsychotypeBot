@@ -123,6 +123,16 @@ namespace Psycho {
         }
     }
     void PsychologicalAnalyzerBot::onGroupMessage(const std::string& message, const std::string& username) {
-        return;
+        std::vectot<std::string> words = parseMessage(message);
+
+        for (const auto& word : words) {
+            for (const auto& [psychotype, key] : psychotypeKeywords) {
+                auto w = key.find(word);
+                if (w != key.end()) {
+                    int score = w->second;
+                    tendency[username][psychotype] += score;
+                }
+            }
+        }
     }
 }
