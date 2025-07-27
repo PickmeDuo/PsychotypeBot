@@ -87,7 +87,7 @@ namespace Psycho {
 
     std::string PsychologicalAnalyzerBot::analyzeGroup(std::map<std::string, std::map<std::string, int>>& tendency) {
         if (tendency.empty()) {
-            return "Нет данных для анализа"
+            return "Нет данных для анализа";
         }
 
         std::string result;
