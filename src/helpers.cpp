@@ -15,14 +15,14 @@ namespace Psycho {
         // -> приводим к нижнему и кладём в clear
 
         for (char c : text) {
-            if (std::isalpha(static_cast<unsigned char>(c))) {
+            int asci = static_cast<int>(c);
+            if ((asci >= 128& asci <= 175) ||
+            (asci >= 224 && asci <= 241))
                 clear += std::tolower(static_cast<unsigned char>(c));
             } else {
                 clear += ' ';
             }
         }
-
-        std::cout << "BBB " << clear << " BBB\n";
 
         std::vector<std::string> words;
         std::istringstream iss(clear); //разбиваем по пробелам
@@ -125,15 +125,9 @@ namespace Psycho {
         }
     }
     void PsychologicalAnalyzerBot::onGroupMessage(const std::string& message, const std::string& username) {
-
-        std::cout << "AAA\n";
-
         std::vector<std::string> words = parseMessage(message);
 
-        std::cout << words.size() << " AAA\n";
-
         for (const auto& word : words) {
-            std::cout << word << "\n";
             for (const auto& [psychotype, key] : psychotypeKeywords) {
                 auto w = key.find(word);
                 if (w != key.end()) {
