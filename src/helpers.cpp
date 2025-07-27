@@ -22,6 +22,8 @@ namespace Psycho {
             }
         }
 
+        std::cout << "BBB " << clear << " BBB\n";
+
         std::vector<std::string> words;
         std::istringstream iss(clear); //разбиваем по пробелам
         std::string word;
@@ -123,9 +125,15 @@ namespace Psycho {
         }
     }
     void PsychologicalAnalyzerBot::onGroupMessage(const std::string& message, const std::string& username) {
+
+        std::cout << "AAA\n";
+
         std::vector<std::string> words = parseMessage(message);
 
+        std::cout << words.size() << " AAA\n";
+
         for (const auto& word : words) {
+            std::cout << word << "\n";
             for (const auto& [psychotype, key] : psychotypeKeywords) {
                 auto w = key.find(word);
                 if (w != key.end()) {

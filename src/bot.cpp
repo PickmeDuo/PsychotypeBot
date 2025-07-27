@@ -133,16 +133,15 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
     bot->getEvents().onAnyMessage([this](TgBot::Message::Ptr message) {
 
         // Проверяем, что сообщение текстовое и из группы, и не от бота
-        if (message->text.empty() || message->chat->type != TgBot::Chat::Type::Group || message->from->isBot) {
-            return;
-        }
+        //if (message->text.empty() || message->chat->type != TgBot::Chat::Type::Group || message->from->isBot) {
+        //    return;
+        //}
 
         // Вызываем наш анализатор
-        if (!message->caption.empty()) // сообщение - медиа с прикрепленным текстом
-            this->onGroupMessage(message->caption, message->from->username);
-        else if (!message->text.empty()) // сообщение - просто текст
-            this->onGroupMessage(message->text, message->from->username);
+        this->onGroupMessage(message->text, message->from->username);
         
+        
+        bot->getApi().sendMessage(message->chat->id, message->from->username + " сказал '" + message->text + "'");
     });
     //...
 }
