@@ -7,20 +7,35 @@
 #include <utility>
 
 namespace Psycho {
+    std::pair<unsigned char, unsigned char> PsychologicalAnalyzerBot::toLoweRu(unsigned char c1, unsigned char c2) {
+        if (c1 == 0xD0 && c2 == 0x81) {
+            return {0xD1, 0x91};
+        } else if (c1 == 0xD0 && c2 >= 0x90 && c2 <= 0xAF) {
+            return {0xD0, static_cast<unsigned char>(c2 + 0x20)};
+        } else if (c1 == 0xD0 && c2 >= 0xA0 && c2 <= 0xAF) {
+            return {0xD1, static_cast<unsigned char>(c2 - 0x40)};
+        } else {
+            return {c1, c2};
+        }
+    }
+
     std::vector<std::string> PsychologicalAnalyzerBot::parseMessage(const std::string& text) {
         std::string clear;
         clear.reserve(text.size());
 
-        //проходим по символам, буква -> 
-        // -> приводим к нижнему и кладём в clear
+        for (size_t i = 0; i < text.size(); ) {
+            unsigned char c = text[i];
 
-        for (char c : text) {
-            int asci = static_cast<int>(c);
-            if ((asci >= 128& asci <= 175) ||
-            (asci >= 224 && asci <= 241))
-                clear += std::tolower(static_cast<unsigned char>(c));
-            } else {
+            if ((c == 0xD0 || c == 0xD1) && i + 1 < text.size()) {
+                unsigned char c2 = text[i + 1];
+
+                auto lower = toLoweRu(c, c2);
+                clear += lower.first;
+                clear += lower.second;
+                i+=2;
+            } else{
                 clear += ' ';
+                ++i;
             }
         }
 
