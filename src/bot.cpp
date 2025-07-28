@@ -1,6 +1,9 @@
 #include "psycho.hpp"
 #include <iostream>
 
+const int64_t SenyaId = 600103789;
+const int64_t SashaId = 859762063;
+
 using json = nlohmann::json;
 
 void save_data(const std::map<std::string, std::map<std::string, int>>& data) {
@@ -27,7 +30,8 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
 
     //Команда /start
     bot->getEvents().onCommand("start", [this](TgBot::Message::Ptr msg) {
-        if (msg->chat->type == TgBot::Chat::Type::Group) {
+        if (msg->from->id != SenyaId || msg->from->id != SashaId) {
+            bot->getApi().sendMessage(msg->chat->id, "Мной могут командовать только Сеня и Саша.");
             return;
         }
         auto keyboard = std::make_shared<TgBot::InlineKeyboardMarkup>();
@@ -76,6 +80,11 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
 
     // Команда /person [username]
     bot->getEvents().onCommand("person", [this](TgBot::Message::Ptr message) {
+        if (message->from->id != SenyaId || message->from->id != SashaId) {
+            bot->getApi().sendMessage(message->chat->id, "Мной могут командовать только Сеня и Саша.");
+            return;
+        }
+
         // Проверяем, что команда имеет аргумент
         if (message->text.empty() || message->text.find(' ') == std::string::npos) {
             bot->getApi().sendMessage(message->chat->id, "Использование: /person [username]");
@@ -132,16 +141,11 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
     //Любое текстовое сообщение
     bot->getEvents().onAnyMessage([this](TgBot::Message::Ptr message) {
 
-        // Проверяем, что сообщение текстовое и из группы, и не от бота
-        //if (message->text.empty() || message->chat->type != TgBot::Chat::Type::Group || message->from->isBot) {
-        //    return;
-        //}
-
         // Вызываем наш анализатор
         this->onGroupMessage(message->text, message->from->username);
         
         
-        bot->getApi().sendMessage(message->chat->id, message->from->username + " сказал '" + message->text + "'");
+        //bot->getApi().sendMessage(message->chat->id, message->from->username + " сказал '" + message->text + "'");
     });
     //...
 }

@@ -142,6 +142,8 @@ namespace Psycho {
     void PsychologicalAnalyzerBot::onGroupMessage(const std::string& message, const std::string& username) {
         std::vector<std::string> words = parseMessage(message);
 
+        std::cout << "Message '" << message << "' has " << words.size() << "words\n";
+
         for (const auto& word : words) {
             for (const auto& [psychotype, key] : psychotypeKeywords) {
                 auto w = key.find(word);

@@ -36,7 +36,7 @@ namespace Psycho {
         // значение — map<ключевое слово, "вес" (важность или частота)>.
         //static std::map<std::string, std::map<std::string, int>> psychotypeKeywords;
 
-        std::pair<unsigned char, unsigned char> toLoweRu(uncigned char c1, uncigned char c2);
+        std::pair<unsigned char, unsigned char> toLoweRu(unsigned char c1, unsigned char c2);
 
         // Парсит строку сообщения на отдельные слова.
         // убирает знаки препинания, приводит к нижнему регистру и т.п.
