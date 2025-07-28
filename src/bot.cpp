@@ -21,11 +21,30 @@ std::map<std::string, std::map<std::string, int>> load_data_tendency() {
     return j.get<std::map<std::string, std::map<std::string, int>>>();
 }
 
+
+void save_data_groupsData(const std::map<int64_t, std::vector<std::string>>& data) {
+    json j = data; // Автоматическое преобразование
+    std::ofstream("groupsData.json") << j.dump(4); // 4 - отступы для читаемости
+}
+
+std::map<int64_t, std::vector<std::string>> load_data_groupsData() {
+    std::ifstream file("groupsData.json");
+    if (!file) return {}; // Если файла нет
+    
+    json j;
+    file >> j;
+    return j.get<std::map<int64_t, std::vector<std::string>>>();
+}
+
+
+
+
 //Объявление бота и все инструкции
 Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& token) 
     : bot(std::make_unique<TgBot::Bot>(token)) {
 
     tendency = load_data_tendency();
+    groupsData = load_data_groupsData();
     
     // Настройка обработчиков
 
@@ -34,16 +53,20 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
     //Команда /save
     bot->getEvents().onCommand("save", [this](TgBot::Message::Ptr msg) {
         save_data_tendency(tendency);
+        save_data_groupsData(groupsData);
+        bot->getApi().sendMessage(msg->chat->id, "Готово! Данные сохранены.");
     });
 
 
 
     //Команда /start
     bot->getEvents().onCommand("start", [this](TgBot::Message::Ptr msg) {
+        /*
         if (!(msg->from->id == SenyaId || msg->from->id == SashaId)) {
             bot->getApi().sendMessage(msg->chat->id, "Мной могут командовать только Сеня и Саша.");
             return;
         }
+        */
         auto keyboard = std::make_shared<TgBot::InlineKeyboardMarkup>();
 
         // Первый ряд кнопок (2 кнопки)
@@ -127,18 +150,18 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
         
         // Обработка разных callbackData
         if (query->data == "btn1") {
-            if (!(query->message->from->id == SenyaId)) {
+            if (!(query->from->id == SenyaId || query->from->id == SashaId)) {
                 bot->getApi().sendMessage(query->message->chat->id, "Мной могут командовать только Сеня и Саша.");
                 return;
             }
             response = "Напиши /person [username]";
-        } 
+        }
         else if (query->data == "btn2") {
-            if (!(query->message->from->id == SenyaId)) {
+            if (!(query->from->id == SenyaId || query->from->id == SashaId)) {
                 bot->getApi().sendMessage(query->message->chat->id, "Мной могут командовать только Сеня и Саша.");
                 return;
             }
-            response = query->from->firstName;
+            response = analyzeGroup(query->message->chat->id);
         } 
         else if (query->data == "btn3") {
 
@@ -192,12 +215,12 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
             row3.push_back(btn7);
             
             TgBot::InlineKeyboardButton::Ptr btn8(new TgBot::InlineKeyboardButton);
-            btn8->text = "Тревожный";
+            btn8->text = "Тревожно-мнительный";
             btn8->callbackData = "type8";
             row3.push_back(btn8);
 
             TgBot::InlineKeyboardButton::Ptr btn9(new TgBot::InlineKeyboardButton);
-            btn9->text = "Депрессивный";
+            btn9->text = "Депрессивно-Печальный";
             btn9->callbackData = "type9";
             row3.push_back(btn9);
             keyboard->inlineKeyboard.push_back(row3);
@@ -244,8 +267,8 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
         else if (query->data == "type7") {
             response = resultDescription("Эмотив");
         }
-        else if (query->data == "type") {
-            response = resultDescription("Тревожно-мнительный");
+        else if (query->data == "type8") {
+            response = resultDescription("Тревожно-Мнительный");
         }
         else if (query->data == "type9") {
             response = resultDescription("Депрессивно-Печальный");
@@ -272,7 +295,8 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
     bot->getEvents().onAnyMessage([this](TgBot::Message::Ptr message) {
 
         // Вызываем наш анализатор
-        this->onGroupMessage(message->text, message->from->username);
+        this->onGroupMessage(message->text, message->from->username, message->chat->id);
+
         
         
         //bot->getApi().sendMessage(message->chat->id,"Парс: '" + dbug + "'");

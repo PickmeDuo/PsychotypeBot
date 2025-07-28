@@ -32,6 +32,8 @@ namespace Psycho {
         // Ключ — username, значение — map<психотип, количество слов склоняющих к психотипу>.
         std::map<std::string, std::map<std::string, int>> tendency;
 
+        std::map<int64_t, std::vector<std::string>> groupsData;
+
         // Главный словарь: ключ — название психотипа, 
         // значение — map<ключевое слово, "вес" (важность или частота)>.
         //static std::map<std::string, std::map<std::string, int>> psychotypeKeywords;
@@ -50,11 +52,11 @@ namespace Psycho {
         std::string analyzePerson(const std::string& name);
 
         // Анализ собранных данных по группе
-        std::string analyzeGroup(const std::map<std::string, std::map<std::string, int>>& tendency);
+        std::string analyzeGroup(const int64_t chat_id);
 
         // Обработчик сообщений в группе.Вызывается при каждом новом сообщении.
         // Парсит сообщение message, анализирует и добавляет данные в tendency человеку с ником username.
-        void onGroupMessage(const std::string& message, const std::string& username);
+        void onGroupMessage(const std::string& message, const std::string& username, const int64_t chat_id);
     };
 
 } 
