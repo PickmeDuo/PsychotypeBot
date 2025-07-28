@@ -6,12 +6,13 @@ const int64_t SashaId = 859762063;
 
 using json = nlohmann::json;
 
-void save_data(const std::map<std::string, std::map<std::string, int>>& data) {
+
+void save_data_tendency(const std::map<std::string, std::map<std::string, int>>& data) {
     json j = data; // Автоматическое преобразование
     std::ofstream("tendency.json") << j.dump(4); // 4 - отступы для читаемости
 }
 
-std::map<std::string, std::map<std::string, int>> load_data() {
+std::map<std::string, std::map<std::string, int>> load_data_tendency() {
     std::ifstream file("tendency.json");
     if (!file) return {}; // Если файла нет
     
@@ -24,13 +25,22 @@ std::map<std::string, std::map<std::string, int>> load_data() {
 Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& token) 
     : bot(std::make_unique<TgBot::Bot>(token)) {
 
-    tendency = load_data();
+    tendency = load_data_tendency();
     
     // Настройка обработчиков
 
+
+
+    //Команда /save
+    bot->getEvents().onCommand("save", [this](TgBot::Message::Ptr msg) {
+        save_data_tendency(tendency);
+    });
+
+
+
     //Команда /start
     bot->getEvents().onCommand("start", [this](TgBot::Message::Ptr msg) {
-        if (msg->from->id != SenyaId || msg->from->id != SashaId) {
+        if (!(msg->from->id == SenyaId || msg->from->id == SashaId)) {
             bot->getApi().sendMessage(msg->chat->id, "Мной могут командовать только Сеня и Саша.");
             return;
         }
@@ -52,7 +62,7 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
         // Второй ряд кнопок (1 кнопка)
         std::vector<TgBot::InlineKeyboardButton::Ptr> row2;
         TgBot::InlineKeyboardButton::Ptr btn3(new TgBot::InlineKeyboardButton);
-        btn3->text = "Сохранить Данные";
+        btn3->text = "Какие есть психотипы?";
         btn3->callbackData = "btn3";
         row2.push_back(btn3);
         keyboard->inlineKeyboard.push_back(row2);
@@ -78,9 +88,10 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
         );
     });
 
+
     // Команда /person [username]
     bot->getEvents().onCommand("person", [this](TgBot::Message::Ptr message) {
-        if (message->from->id != SenyaId || message->from->id != SashaId) {
+        if (!(message->from->id == SenyaId || message->from->id == SashaId)) {
             bot->getApi().sendMessage(message->chat->id, "Мной могут командовать только Сеня и Саша.");
             return;
         }
@@ -105,20 +116,139 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
     });
 
 
+
+
+
+
+
     // Обработчик нажатий кнопок
     bot->getEvents().onCallbackQuery([this](TgBot::CallbackQuery::Ptr query) {
         std::string response;
         
         // Обработка разных callbackData
         if (query->data == "btn1") {
+            if (!(query->message->from->id == SenyaId)) {
+                bot->getApi().sendMessage(query->message->chat->id, "Мной могут командовать только Сеня и Саша.");
+                return;
+            }
             response = "Напиши /person [username]";
         } 
         else if (query->data == "btn2") {
-            response = query->from->firstName + "Сегодня солнечно, +25°C!";
+            if (!(query->message->from->id == SenyaId)) {
+                bot->getApi().sendMessage(query->message->chat->id, "Мной могут командовать только Сеня и Саша.");
+                return;
+            }
+            response = query->from->firstName;
         } 
         else if (query->data == "btn3") {
-            save_data(tendency);
-            response = "Готово! Данные сохранены.";
+
+
+
+
+
+            auto keyboard = std::make_shared<TgBot::InlineKeyboardMarkup>();
+
+            // Первый ряд кнопок (3 кнопки)
+            std::vector<TgBot::InlineKeyboardButton::Ptr> row1;
+            TgBot::InlineKeyboardButton::Ptr btn1(new TgBot::InlineKeyboardButton);
+            btn1->text = "Пикми";
+            btn1->callbackData = "type1";
+            row1.push_back(btn1);
+            
+            TgBot::InlineKeyboardButton::Ptr btn2(new TgBot::InlineKeyboardButton);
+            btn2->text = "Истероид";
+            btn2->callbackData = "type2";
+            row1.push_back(btn2);
+
+            TgBot::InlineKeyboardButton::Ptr btn3(new TgBot::InlineKeyboardButton);
+            btn3->text = "Эпилептоид";
+            btn3->callbackData = "type3";
+            row1.push_back(btn3);
+            keyboard->inlineKeyboard.push_back(row1);
+            
+            // Второй ряд кнопок (3 кнопки)
+            std::vector<TgBot::InlineKeyboardButton::Ptr> row2;
+            TgBot::InlineKeyboardButton::Ptr btn4(new TgBot::InlineKeyboardButton);
+            btn4->text = "Шизоид";
+            btn4->callbackData = "type4";
+            row2.push_back(btn4);
+            
+            TgBot::InlineKeyboardButton::Ptr btn5(new TgBot::InlineKeyboardButton);
+            btn5->text = "Гипертим";
+            btn5->callbackData = "type5";
+            row2.push_back(btn5);
+
+            TgBot::InlineKeyboardButton::Ptr btn6(new TgBot::InlineKeyboardButton);
+            btn6->text = "Параноял";
+            btn6->callbackData = "type6";
+            row2.push_back(btn6);
+            keyboard->inlineKeyboard.push_back(row2);
+
+            // Третий ряд кнопок (3 кнопки)
+            std::vector<TgBot::InlineKeyboardButton::Ptr> row3;
+            TgBot::InlineKeyboardButton::Ptr btn7(new TgBot::InlineKeyboardButton);
+            btn7->text = "Эмотив";
+            btn7->callbackData = "type7";
+            row3.push_back(btn7);
+            
+            TgBot::InlineKeyboardButton::Ptr btn8(new TgBot::InlineKeyboardButton);
+            btn8->text = "Тревожный";
+            btn8->callbackData = "type8";
+            row3.push_back(btn8);
+
+            TgBot::InlineKeyboardButton::Ptr btn9(new TgBot::InlineKeyboardButton);
+            btn9->text = "Депрессивный";
+            btn9->callbackData = "type9";
+            row3.push_back(btn9);
+            keyboard->inlineKeyboard.push_back(row3);
+            
+            // Настройки предпросмотра ссылок (новый обязательный параметр)
+            auto linkPreviewOptions = std::make_shared<TgBot::LinkPreviewOptions>();
+            linkPreviewOptions->isDisabled = true; // Выключаем предпросмотр
+
+            // 4. Сущности сообщения (пустой вектор по умолчанию)
+            std::vector<TgBot::MessageEntity::Ptr> entities;
+
+            // 5. Отправка сообщения
+            bot->getApi().sendMessage(
+                query->message->chat->id,         // chat_id
+                "Про какой психотип рассказать",  // text
+                linkPreviewOptions,               // link_preview_options
+                0,                                // reply_to_message_id
+                keyboard,                         // reply_markup
+                "HTML",                           // parse_mode
+                false,                            // disable_notification
+                entities,                         // entities (новый параметр вместо message_thread_id)
+                false                             // protect_content
+            );
+            return;
+        }
+        else if (query->data == "type1") {
+            response = resultDescription("Пикми");
+        }
+        else if (query->data == "type2") {
+            response = resultDescription("Истероид");
+        }
+        else if (query->data == "type3") {
+            response = resultDescription("Эпилептоид");
+        }
+        else if (query->data == "type4") {
+            response = resultDescription("Шизоид");
+        }
+        else if (query->data == "type5") {
+            response = resultDescription("Гипертим");
+        }
+        else if (query->data == "type6") {
+            response = resultDescription("Параноял");
+        }
+        else if (query->data == "type7") {
+            response = resultDescription("Эмотив");
+        }
+        else if (query->data == "type") {
+            response = resultDescription("Тревожно-мнительный");
+        }
+        else if (query->data == "type9") {
+            response = resultDescription("Депрессивно-Печальный");
         }
         else {
             response = "Неизвестная команда";
@@ -145,7 +275,7 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
         this->onGroupMessage(message->text, message->from->username);
         
         
-        //bot->getApi().sendMessage(message->chat->id, message->from->username + " сказал '" + message->text + "'");
+        //bot->getApi().sendMessage(message->chat->id,"Парс: '" + dbug + "'");
     });
     //...
 }
