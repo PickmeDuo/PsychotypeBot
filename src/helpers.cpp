@@ -10,7 +10,7 @@ namespace Psycho {
     std::pair<unsigned char, unsigned char> PsychologicalAnalyzerBot::toLoweRu(unsigned char c1, unsigned char c2) {
         if (c1 == 0xD0 && c2 == 0x81) {
             return {0xD1, 0x91};
-        } else if (c1 == 0xD0 && c2 >= 0x90 && c2 <= 0xAF) {
+        } else if (c1 == 0xD0 && c2 >= 0x90 && c2 <= 0x9F) {
             return {0xD0, static_cast<unsigned char>(c2 + 0x20)};
         } else if (c1 == 0xD0 && c2 >= 0xA0 && c2 <= 0xAF) {
             return {0xD1, static_cast<unsigned char>(c2 - 0x40)};
