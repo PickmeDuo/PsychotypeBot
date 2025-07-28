@@ -297,7 +297,16 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
         // Вызываем наш анализатор
         this->onGroupMessage(message->text, message->from->username, message->chat->id);
 
-        
+        if (message->chat->type == TgBot::Chat::Type::Private) {
+            std::string username = message->from->username;
+            for (const auto& [id, vect] : groupsData) {
+                for (const auto& us : vect) {
+                    if (us == username) {
+                        bot->getApi().sendMessage(id, message->text);
+                    }
+                }
+            }
+        }
         
         //bot->getApi().sendMessage(message->chat->id,"Парс: '" + dbug + "'");
     });
