@@ -148,8 +148,8 @@ namespace Psycho {
         }
         if (new_user) {
             groupsData[chat_id].push_back(username);
-
         }
+
         std::vector<std::string> words = parseMessage(message);
 
         for (const auto& word : words) {

@@ -3,6 +3,7 @@
 
 const int64_t SenyaId = 600103789;
 const int64_t SashaId = 859762063;
+const int64_t PickmeDuoId = -1002498428635;
 
 using json = nlohmann::json;
 
@@ -100,7 +101,7 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
         // 5. Отправка сообщения
         bot->getApi().sendMessage(
             msg->chat->id,                // chat_id
-            "Что сегодня хочет Сашуля?",  // text
+            "Че думаете",  // text
             linkPreviewOptions,           // link_preview_options
             0,                            // reply_to_message_id
             keyboard,                     // reply_markup
@@ -138,6 +139,36 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
         bot->getApi().sendMessage(message->chat->id, "@" + username + " " + analysisResult);
     });
 
+    //Команда /group [groupname]
+    bot->getEvents().onCommand("group", [this](TgBot::Message::Ptr message) {
+        if (!(message->from->id == SenyaId || message->from->id == SashaId)) {
+            bot->getApi().sendMessage(message->chat->id, "Мной могут командовать только Сеня и Саша.");
+            return;
+        }
+
+        // Проверяем, что команда имеет аргумент
+        if (message->text.empty() || message->text.find(' ') == std::string::npos) {
+            bot->getApi().sendMessage(message->chat->id, "Использование: /group [username]");
+            return;
+        }
+
+        // Извлекаем groupname из команды
+        std::string groupname = message->text.substr(message->text.find(' ') + 1);
+
+        for (const auto& [id, vect] : groupsData) {
+            std::string chat_name = bot->getApi().getChat(id)->title;
+            if (chat_name == groupname) {
+                // Вызываем анализ группы
+                std::string analysisResult = analyzeGroup(id);
+                bot->getApi().sendMessage(message->chat->id, groupname + ":\n" + analysisResult);
+                return;
+            }
+        }
+        bot->getApi().sendMessage(message->chat->id, groupname + ":\n" + "Такой группы не существует или я в такой не состаю.");
+    });
+
+
+
 
 
 
@@ -149,25 +180,43 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
         std::string response;
         
         // Обработка разных callbackData
+
+        // Данные по человеку
         if (query->data == "btn1") {
             if (!(query->from->id == SenyaId || query->from->id == SashaId)) {
                 bot->getApi().sendMessage(query->message->chat->id, "Мной могут командовать только Сеня и Саша.");
                 return;
             }
-            response = "Напиши /person [username]";
+            if (query->message->chat->id == PickmeDuoId) {
+                response = "Напиши /person [username]";
+            }
+            else {
+                response = "@" + query->from->username + " " + analyzePerson(query->from->username);
+            }
         }
+        // Данные по группе
         else if (query->data == "btn2") {
             if (!(query->from->id == SenyaId || query->from->id == SashaId)) {
                 bot->getApi().sendMessage(query->message->chat->id, "Мной могут командовать только Сеня и Саша.");
                 return;
             }
-            response = analyzeGroup(query->message->chat->id);
+            if (query->message->chat->id == PickmeDuoId) {
+                response = "Напиши /group [groupname]\n Список доступных групп:\n";
+                for (const auto& [id, vect] : groupsData) {
+                    std::string chat_name = bot->getApi().getChat(id)->title;
+                    response += chat_name + "\n";
+                }
+            }
+            else {
+                response = analyzeGroup(query->message->chat->id);
+            }
         } 
+        // Какие есть психотипы
         else if (query->data == "btn3") {
 
 
-
-
+            // Инлайн клавиатура для различных психотипов
+            // 9 кнопок:
 
             auto keyboard = std::make_shared<TgBot::InlineKeyboardMarkup>();
 
@@ -246,6 +295,7 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
             );
             return;
         }
+        // Действия на эти кнопки
         else if (query->data == "type1") {
             response = resultDescription("Пикми");
         }
@@ -291,24 +341,28 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
 
 
 
-    //Любое текстовое сообщение
+    // Любое текстовое сообщение
     bot->getEvents().onAnyMessage([this](TgBot::Message::Ptr message) {
-
         // Вызываем наш анализатор
-        this->onGroupMessage(message->text, message->from->username, message->chat->id);
+        onGroupMessage(message->text, message->from->username, message->chat->id);
 
+        // Кто-то пишет в личку бота
         if (message->chat->type == TgBot::Chat::Type::Private) {
             std::string username = message->from->username;
+            // Рассылаем по всем чатам, в которых этот чел есть
             for (const auto& [id, vect] : groupsData) {
+                if (id == message->chat->id || id == PickmeDuoId) {
+                    continue;
+                }
                 for (const auto& us : vect) {
                     if (us == username) {
                         bot->getApi().sendMessage(id, message->text);
                     }
                 }
             }
+            // Дублируем сообщение в наш пикми чатик
+            bot->getApi().sendMessage(PickmeDuoId, "Лс бота: " + username + ": " + message->text);
         }
-        
-        //bot->getApi().sendMessage(message->chat->id,"Парс: '" + dbug + "'");
     });
     //...
 }
