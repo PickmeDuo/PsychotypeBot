@@ -54,13 +54,13 @@ namespace Psycho {
         auto userId = tendency.find(name);
 
         if (userId == tendency.end()) {
-            return "Нет данных для" + name;
+            return "Нет данных";
         }
 
         const auto& userPsycho = userId->second;
 
         if (userPsycho.empty()) {
-            return "Недостаточно информации для" + name;
+            return "Нет данных";
         }
 
         std::vector<std::pair<std::string, int>> sorted(userPsycho.begin(), userPsycho.end());

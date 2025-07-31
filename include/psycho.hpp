@@ -32,11 +32,9 @@ namespace Psycho {
         // Ключ — username, значение — map<психотип, количество слов склоняющих к психотипу>.
         std::map<std::string, std::map<std::string, int>> tendency;
 
+        // Информация о группах.
+        // Ключ - id группы, значение - вектор всех людей, состоящих в этой группе.
         std::map<int64_t, std::vector<std::string>> groupsData;
-
-        // Главный словарь: ключ — название психотипа, 
-        // значение — map<ключевое слово, "вес" (важность или частота)>.
-        //static std::map<std::string, std::map<std::string, int>> psychotypeKeywords;
 
         std::pair<unsigned char, unsigned char> toLoweRu(unsigned char c1, unsigned char c2);
 

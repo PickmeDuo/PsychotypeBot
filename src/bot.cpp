@@ -4,8 +4,15 @@
 const int64_t SenyaId = 600103789;
 const int64_t SashaId = 859762063;
 const int64_t PickmeDuoId = -1002498428635;
+const int64_t _241Id = -1002204012992;
+const int64_t _242Id = -1002177162783;
+
+const int SAVEMAX = 20;
+int saveCnt = 0;
 
 using json = nlohmann::json;
+
+
 
 
 void save_data_tendency(const std::map<std::string, std::map<std::string, int>>& data) {
@@ -148,7 +155,7 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
 
         // Проверяем, что команда имеет аргумент
         if (message->text.empty() || message->text.find(' ') == std::string::npos) {
-            bot->getApi().sendMessage(message->chat->id, "Использование: /group [username]");
+            bot->getApi().sendMessage(message->chat->id, "Использование: /group [groupname]");
             return;
         }
 
@@ -167,7 +174,27 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
         bot->getApi().sendMessage(message->chat->id, groupname + ":\n" + "Такой группы не существует или я в такой не состаю.");
     });
 
+    //Команда /241
+    bot->getEvents().onCommand("241", [this](TgBot::Message::Ptr message) {
+        if (!(message->from->id == SenyaId || message->from->id == SashaId)) {
+            bot->getApi().sendMessage(message->chat->id, "Мной могут командовать только Сеня и Саша.");
+            return;
+        }
 
+        std::string analysisResult = analyzeGroup(_241Id);
+        bot->getApi().sendMessage(message->chat->id, "241:\n" + analysisResult);
+    });
+
+    //Команда /242
+    bot->getEvents().onCommand("242", [this](TgBot::Message::Ptr message) {
+        if (!(message->from->id == SenyaId || message->from->id == SashaId)) {
+            bot->getApi().sendMessage(message->chat->id, "Мной могут командовать только Сеня и Саша.");
+            return;
+        }
+
+        std::string analysisResult = analyzeGroup(_242Id);
+        bot->getApi().sendMessage(message->chat->id, "242:\n" + analysisResult);
+    });
 
 
 
@@ -187,9 +214,11 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
                 bot->getApi().sendMessage(query->message->chat->id, "Мной могут командовать только Сеня и Саша.");
                 return;
             }
+            /*
             if (query->message->chat->id == PickmeDuoId) {
                 response = "Напиши /person [username]";
             }
+            */
             else {
                 response = "@" + query->from->username + " " + analyzePerson(query->from->username);
             }
@@ -206,6 +235,8 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
                     std::string chat_name = bot->getApi().getChat(id)->title;
                     response += chat_name + "\n";
                 }
+                response += "\nВаша группа:\n";
+                response += analyzeGroup(query->message->chat->id);
             }
             else {
                 response = analyzeGroup(query->message->chat->id);
@@ -343,6 +374,10 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
 
     // Любое текстовое сообщение
     bot->getEvents().onAnyMessage([this](TgBot::Message::Ptr message) {
+
+        //log
+        std::cout << message->from->username << ": " << message->text << "\n";
+
         // Вызываем наш анализатор
         onGroupMessage(message->text, message->from->username, message->chat->id);
 
@@ -355,13 +390,22 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
                     continue;
                 }
                 for (const auto& us : vect) {
-                    if (us == username) {
+                    if (us == username && !message->text.empty()) {
                         bot->getApi().sendMessage(id, message->text);
                     }
                 }
             }
             // Дублируем сообщение в наш пикми чатик
             bot->getApi().sendMessage(PickmeDuoId, "Лс бота: " + username + ": " + message->text);
+        }
+
+        //Раз в SAVEMAX сообщений сохраняем данные
+        ++saveCnt;
+        if (saveCnt == SAVEMAX) {
+            save_data_tendency(tendency);
+            save_data_groupsData(groupsData);
+            saveCnt = 0;
+            std::cout << "Data Saved.\n";
         }
     });
     //...
