@@ -196,6 +196,40 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
         bot->getApi().sendMessage(message->chat->id, "242:\n" + analysisResult);
     });
 
+    //Команда /send241 [message]
+    bot->getEvents().onCommand("send241", [this](TgBot::Message::Ptr message) {
+        if (!(message->from->id == SenyaId || message->from->id == SashaId)) {
+            bot->getApi().sendMessage(message->chat->id, "Мной могут командовать только Сеня и Саша.");
+            return;
+        }
+        
+        // Извлекаем text из команды
+        std::string text = message->text.substr(message->text.find(' ') + 1);
+
+        if (text.empty()) {
+            bot->getApi().sendMessage(message->chat->id, "Не могу отправить пустое сообщение(");
+        }
+
+        bot->getApi().sendMessage(_241Id, text);
+    });
+
+    //Команда /send242 [message]
+    bot->getEvents().onCommand("send242", [this](TgBot::Message::Ptr message) {
+        if (!(message->from->id == SenyaId || message->from->id == SashaId)) {
+            bot->getApi().sendMessage(message->chat->id, "Мной могут командовать только Сеня и Саша.");
+            return;
+        }
+        
+        // Извлекаем text из команды
+        std::string text = message->text.substr(message->text.find(' ') + 1);
+
+        if (text.empty()) {
+            bot->getApi().sendMessage(message->chat->id, "Не могу отправить пустое сообщение(");
+        }
+
+        bot->getApi().sendMessage(_242Id, text);
+    });
+
 
 
 
@@ -384,6 +418,7 @@ Psycho::PsychologicalAnalyzerBot::PsychologicalAnalyzerBot(const std::string& to
         // Кто-то пишет в личку бота
         if (message->chat->type == TgBot::Chat::Type::Private) {
             std::string username = message->from->username;
+
             // Рассылаем по всем чатам, в которых этот чел есть
             for (const auto& [id, vect] : groupsData) {
                 if (id == message->chat->id || id == PickmeDuoId) {
